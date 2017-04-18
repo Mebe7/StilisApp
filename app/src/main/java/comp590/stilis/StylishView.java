@@ -35,8 +35,8 @@ public class StylishView extends View {
 
     //TODO: RENAME and flesh out exact method signature
     public void victorSentMeSomething() {
-        float newX = 123; //TODO: replace with actual code to compute this given a distance
-        float newY = 123; //TODO: replace with actual code to compute this given a distance
+        float newX = 123; //TODO: replace with actual code to take what given and plot
+        float newY = 123; //TODO: replace with actual code to take what given and plot
 
         stylishPath.lineTo(newX, newY);
         invalidate();
