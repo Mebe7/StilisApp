@@ -8,30 +8,34 @@ import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import static android.hardware.Sensor.TYPE_GRAVITY;
+
 public class sensorChecker extends AppCompatActivity implements SensorEventListener{
 
     private SensorManager mSensorManager;
-    private Sensor mAccelerometer, mGyro;
+    private Sensor mLinearAccel, mGyro;
     private long mTime = System.nanoTime();
-    private float vX=0, vY=0,vZ=0;
-    private float coordX=0, coordY= 0;
-    private float aX=0, aY=0, aZ=0;
+    private float vX=0, vY=0,vZ=0; //actual velocity
+    private float coordXCenter=0, coordYCenter= 0; //used by accelerometer to keep track of center of phone
+    private float aX=0, aY=0, aZ=0; //actual acceleration as last measured
+    private float mPitch = 0, mYaw = 0, mRoll = 0; //tilt of phone
+    private float coordXTip, coordYTip; // actual coordinates of tip of phone, to be returned to UI
 
-    //distance in meters from center of phone to corner
-    private final float hypotenuse = 0.1f;
+    private final float hypotenuse = 0.086f;//distance in meters from center of phone to corner
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor_checker);
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //Note, this automatically takes account of gravity for us
+        mLinearAccel= mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
     }
 
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this, mAccelerometer, 10000);
+        mSensorManager.registerListener(this, mLinearAccel, 10000);
         mSensorManager.registerListener(this, mGyro, 10000);
     }
 
@@ -55,7 +59,7 @@ public class sensorChecker extends AppCompatActivity implements SensorEventListe
             gyroChange(tDif, sensorEvent.values);
             return;
         }
-        else{
+        else if (sensorEvent.sensor.getType() == sensorEvent.sensor.TYPE_LINEAR_ACCELERATION){
             accelChange(tDif, sensorEvent.values);
         }
     }
@@ -67,8 +71,8 @@ update "initial" acceleration
  */
     private void accelChange(float tDif, float values[]){
         float halfTimeSquared = (tDif * tDif)/2;
-        coordX = coordX + (tDif * vX) + halfTimeSquared*aX;
-        coordY = coordY + (tDif * vY) + halfTimeSquared*aY;
+        coordXCenter = coordXCenter + (tDif * vX) + halfTimeSquared*aX;
+        coordYCenter = coordYCenter + (tDif * vY) + halfTimeSquared*aY;
         vX = vX + tDif * values[0];
         vY = vY + tDif * values[1];
 
@@ -86,4 +90,9 @@ update "initial" acceleration
 
     }
 
+
+    //updates coordXtip and coordYtip based off center location and orientation
+    private void updateTip{
+
+    }
 }
