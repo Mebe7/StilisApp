@@ -6,5 +6,6 @@
         <item>Color</item>
         <item>Weight</item>
         <item>Stroke</item>
+        <item>Help</item>
     </string-array>
 </resources>

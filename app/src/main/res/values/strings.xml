@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Stilis</string>
+    <string name="dialog_message">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Vestibulum fermentum in augue et viverra. Suspendisse aliquet eu leo ac aliquet.
+        Vestibulum tristique mollis accumsan. Duis tincidunt egestas enim.
+        Morbi euismod nec arcu quis malesuada. In sed enim non nulla iaculis rhoncus.
+        Suspendisse molestie nisl commodo, hendrerit ex a, sodales massa.
+        Cras volutpat purus nec varius ornare. Duis eget aliquet </string>
 </resources>

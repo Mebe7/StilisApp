@@ -92,7 +92,7 @@ update "initial" acceleration
 
 
     //updates coordXtip and coordYtip based off center location and orientation
-    private void updateTip{
+    private void updateTip(){
 
     }
 }
