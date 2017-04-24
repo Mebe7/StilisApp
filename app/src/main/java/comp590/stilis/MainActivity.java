@@ -1,5 +1,6 @@
 package comp590.stilis;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -19,6 +20,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.UUID;
 
@@ -36,51 +39,62 @@ public class MainActivity extends AppCompatActivity {
         menuItems = getResources().getStringArray(R.array.menu_strings);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         menuList = (ListView) findViewById(R.id.left_drawer);
-        notepad = (StylishView) findViewById(R.id.drawing_surface);
+        notepad = (StylishView) findViewById(R.id.notepad);
 
         notepad.setDrawingCacheEnabled(true);
 
+        menuList.setAdapter(new ArrayAdapter<String>(this,
+                R.layout.drawer_list_item, menuItems));
 
-        menuList.setOnItemClickListener(new ListView.OnItemClickListener(){
+        menuList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-               Log.i("GOOD", "CLICK HAPPENED");
-
+                Log.wtf("CLICK", "CLICK IN ANONYMOUS CLASS");
                 switch (position) {
                     //Save
-                    case 1:
+                    case 0:
+                        menuList.setItemChecked(0, false);
                         save();
+                        drawer.closeDrawers();
                         break;
 
                     //Clear
-                    case 2:
+                    case 1:
+                        menuList.setItemChecked(1, false);
                         clear();
+                        drawer.closeDrawers();
                         break;
 
                     //Color
-                    case 3:
+                    case 2:
+                        menuList.setItemChecked(2, false);
                         color();
+                        drawer.closeDrawers();
                         break;
 
                     //Weight
-                    case 4:
+                    case 3:
+                        menuList.setItemChecked(3, false);
                         weight();
+                        drawer.closeDrawers();
                         break;
 
                     //Stroke
-                    case 5:
+                    case 4:
+                        menuList.setItemChecked(4, false);
                         stroke();
+                        drawer.closeDrawers();
                         break;
 
                     //Help
-                    case 6:
+                    case 5:
+                        menuList.setItemChecked(5, false);
                         help();
+                        drawer.closeDrawers();
                         break;
                 }
             }
-
         });
-
     }
 
     //TODO: REPLACE LOREM IPSUM
