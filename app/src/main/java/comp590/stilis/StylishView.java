@@ -20,6 +20,25 @@ public class StylishView extends View {
         init();
     }
 
+    public StylishView(Context context, AttributeSet attrs){
+        super(context, attrs);
+        init();
+    }
+
+    public StylishView(Context context){
+        super(context);
+        init();
+    }
+
+    public StylishView(Context context, AttributeSet attrs, int defStyleAttr){
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    public Paint getPaint(){
+        return stylishPaint;
+    }
+
     //Lets us change the paint from the MainActivity
     public void changePaint(Paint newPaint) {
         stylishPaint = newPaint;
