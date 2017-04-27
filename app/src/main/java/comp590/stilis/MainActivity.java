@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        start();
+
     }
 
     //TODO: REPLACE LOREM IPSUM
