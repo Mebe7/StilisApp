@@ -10,10 +10,11 @@ import android.view.View;
 
 public class StylishView extends View {
 
-    Paint stylishPaint = new Paint();
-    Path stylishPath = new Path();
-    float lastX = 0; //Might need to do something with these to increase UX
-    float lastY = 0; //Might need to do something with these to increase UX
+    private Paint stylishPaint = new Paint();
+    private Path stylishPath = new Path();
+    private float lastX = 0; //Might need to do something with these to increase UX
+    private float lastY = 0; //Might need to do something with these to increase UX
+    private float tallestPoint = 0; //maximum drawing height; if not set, cannot draw by design
 
     public StylishView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
@@ -40,7 +41,7 @@ public class StylishView extends View {
     }
 
     //Lets us change the paint from the MainActivity
-    public void changePaint(Paint newPaint) {
+    public void setPaint(Paint newPaint) {
         stylishPaint = newPaint;
     }
 
@@ -49,21 +50,25 @@ public class StylishView extends View {
         stylishPaint.setStyle(Paint.Style.STROKE);
         stylishPaint.setAntiAlias(true);
 
+
         stylishPath.moveTo(lastX, lastY);
     }
 
-    //TODO: RENAME and flesh out exact method signature
-    public void victorSentMeSomething() {
-        float newX = 123; //TODO: replace with actual code to take what given and plot
-        float newY = 123; //TODO: replace with actual code to take what given and plot
+    //TODO: RENAME and flesh out
+    public void victorSentMeSomething(float[] tip) {
+        float newX = tip[0];
+        float newY = tip[1];
 
-        stylishPath.lineTo(newX, newY);
-        invalidate();
+        if(tip[2] < tallestPoint) {
+            stylishPath.lineTo(newX, newY);
+            invalidate();
+        }
     }
 
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        canvas.drawARGB(255, 255, 255, 255);
         canvas.drawPath(stylishPath, stylishPaint);
     }
 
@@ -75,11 +80,20 @@ public class StylishView extends View {
         invalidate();
     }
 
-    public void setLastX(float newX) {
+    private void setLastX(float newX) {
         lastX = newX;
     }
 
-    public void setLastY(float newY) {
+    private void setLastY(float newY) {
         lastY = newY;
+    }
+
+    public void setStart(float x, float y){
+        setLastX(x);
+        setLastY(y);
+    }
+
+    public void setDrawingHeight(float height){
+        tallestPoint = height;
     }
 }

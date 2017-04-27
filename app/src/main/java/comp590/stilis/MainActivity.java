@@ -1,47 +1,53 @@
 package comp590.stilis;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
-    private String[] menuItems;
     private DrawerLayout drawer;
     private ListView menuList;
     private StylishView notepad;
+    private sensorChecker sensorListener;
+    private SensorManager mSensorManager;
+    private Sensor mLinearAccel;
+    private Sensor mGyro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        menuItems = getResources().getStringArray(R.array.menu_strings);
+        String[] menuItems = getResources().getStringArray(R.array.menu_strings);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         menuList = (ListView) findViewById(R.id.left_drawer);
         notepad = (StylishView) findViewById(R.id.notepad);
 
         notepad.setDrawingCacheEnabled(true);
+
+        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        mLinearAccel= mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+
+        sensorListener = new sensorChecker(mLinearAccel, mGyro, notepad);
+
+        mSensorManager.registerListener(sensorListener, mLinearAccel, 10000);
+        mSensorManager.registerListener(sensorListener, mGyro, 10000);
 
         menuList.setAdapter(new ArrayAdapter<String>(this,
                 R.layout.drawer_list_item, menuItems));
@@ -49,56 +55,14 @@ public class MainActivity extends AppCompatActivity {
         menuList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.wtf("CLICK", "CLICK IN ANONYMOUS CLASS");
-                switch (position) {
-                    //Save
-                    case 0:
-                        menuList.setItemChecked(0, false);
-                        save();
-                        drawer.closeDrawers();
-                        break;
-
-                    //Clear
-                    case 1:
-                        menuList.setItemChecked(1, false);
-                        clear();
-                        drawer.closeDrawers();
-                        break;
-
-                    //Color
-                    case 2:
-                        menuList.setItemChecked(2, false);
-                        color();
-                        drawer.closeDrawers();
-                        break;
-
-                    //Weight
-                    case 3:
-                        menuList.setItemChecked(3, false);
-                        weight();
-                        drawer.closeDrawers();
-                        break;
-
-                    //Stroke
-                    case 4:
-                        menuList.setItemChecked(4, false);
-                        stroke();
-                        drawer.closeDrawers();
-                        break;
-
-                    //Help
-                    case 5:
-                        menuList.setItemChecked(5, false);
-                        help();
-                        drawer.closeDrawers();
-                        break;
-                }
+                poicker(position);
             }
         });
+
     }
 
     //TODO: REPLACE LOREM IPSUM
-    protected void help() {
+    private void help() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setMessage(R.string.dialog_message)
@@ -108,11 +72,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    protected void clear() {
+    private void clear() {
         notepad.clear();
     }
 
-    protected void save() {
+    private void save() {
         notepad.buildDrawingCache();
         Bitmap image = Bitmap.createBitmap(notepad.getDrawingCache());
 
@@ -121,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         MediaStore.Images.Media.insertImage(getContentResolver(), image, imageName, "Stilis note");
     }
 
-    protected void color() {
+    private void color() {
         String[] colors = {"Black", "Blue", "Red", "Green", "Yellow"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -135,31 +99,31 @@ public class MainActivity extends AppCompatActivity {
                             //Color Black
                             case 0:
                                 currentPaint.setColor(Color.BLACK);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //Color Blue
                             case 1:
                                 currentPaint.setColor(Color.BLUE);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //Color Red
                             case 2:
                                 currentPaint.setColor(Color.RED);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //Color Green
                             case 3:
                                 currentPaint.setColor(Color.GREEN);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //Color Yellow
                             case 4:
                                 currentPaint.setColor(Color.YELLOW);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
                         }
                     }
@@ -167,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
-    protected void weight() {
+    private void weight() {
         String[] weights = {"Hairline", "2px", "3px", "4px", "5px", "6px", "7px", "8px", "9px", "10px"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -181,61 +145,61 @@ public class MainActivity extends AppCompatActivity {
                             //Hairline
                             case 0:
                                 currentPaint.setStrokeWidth(0);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //2px
                             case 1:
                                 currentPaint.setStrokeWidth(2);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //3px
                             case 2:
                                 currentPaint.setStrokeWidth(3);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //4px
                             case 3:
                                 currentPaint.setStrokeWidth(4);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //5px
                             case 4:
                                 currentPaint.setStrokeWidth(5);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //6px
                             case 5:
                                 currentPaint.setStrokeWidth(6);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //7px
                             case 6:
                                 currentPaint.setStrokeWidth(7);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //8px
                             case 7:
                                 currentPaint.setStrokeWidth(8);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //9px
                             case 8:
                                 currentPaint.setStrokeWidth(9);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //10px
                             case 9:
                                 currentPaint.setStrokeWidth(10);
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
                         }
                     }
@@ -243,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
-    protected void stroke() {
+    private void stroke() {
         String[] colors = {"Solid", "Dashed", "Dotted"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -257,25 +221,98 @@ public class MainActivity extends AppCompatActivity {
                             //Solid Line
                             case 0:
                                 currentPaint.setPathEffect(new DashPathEffect(new float[] {0,0}, 0));
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //Dashed Line
                             case 1:
                                 currentPaint.setPathEffect(new DashPathEffect(new float[] {10,20}, 0));
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                             //Dotted Line
                             case 2:
                                 currentPaint.setPathEffect(new DashPathEffect(new float[] {10,10}, 0));
-                                notepad.changePaint(currentPaint);
+                                notepad.setPaint(currentPaint);
                                 break;
 
                         }
                     }
                 });
         builder.show();
+
+    }
+
+    protected void onResume() {
+        super.onResume();
+        mSensorManager.registerListener(sensorListener, mLinearAccel, 10000);
+        mSensorManager.registerListener(sensorListener, mGyro, 10000);
+    }
+
+    protected void onPause() {
+        super.onPause();
+        mSensorManager.unregisterListener(sensorListener);
+    }
+
+    protected void poicker(int position){
+        switch (position) {
+            //Save
+            case 0:
+                menuList.setItemChecked(0, false);
+                save();
+                drawer.closeDrawers();
+                break;
+
+            //Clear
+            case 1:
+                menuList.setItemChecked(1, false);
+                clear();
+                drawer.closeDrawers();
+                break;
+
+            //Color
+            case 2:
+                menuList.setItemChecked(2, false);
+                color();
+                drawer.closeDrawers();
+                break;
+
+            //Weight
+            case 3:
+                menuList.setItemChecked(3, false);
+                weight();
+                drawer.closeDrawers();
+                break;
+
+            //Stroke
+            case 4:
+                menuList.setItemChecked(4, false);
+                stroke();
+                drawer.closeDrawers();
+                break;
+
+            //Help
+            case 5:
+                menuList.setItemChecked(5, false);
+                help();
+                drawer.closeDrawers();
+                break;
+        }
+    }
+
+    private void start(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage("Please place your phone on the surface and wait" + '\n' + "We need to calibrate")
+                .setTitle("Calibrating");
+
+        AlertDialog messageBox = builder.create();
+        messageBox.show();
+
+        while(sensorListener.averageReturner() == -1){}
+
+        notepad.setDrawingHeight(sensorListener.averageReturner() + .2f);
+        messageBox.dismiss();
 
     }
 }

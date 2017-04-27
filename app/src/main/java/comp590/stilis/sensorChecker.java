@@ -4,18 +4,15 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.provider.Settings;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
-import static android.content.Context.SENSOR_SERVICE;
-import static android.hardware.Sensor.TYPE_GRAVITY;
+import java.util.ArrayList;
 
-public class sensorChecker extends AppCompatActivity implements SensorEventListener{
+public class sensorChecker implements SensorEventListener{
 
 
     private SensorManager mSensorManager;
     private Sensor mLinearAccel, mGyro;
+    private StylishView notepad;
     private long mTime = System.nanoTime();
     private float vX=0, vY=0, vZ=0; //absolute velocity
     private float coordXCenter=0, coordYCenter=0, coordZCenter=0; //used by accelerometer to keep track of center of phone
@@ -23,30 +20,23 @@ public class sensorChecker extends AppCompatActivity implements SensorEventListe
     private float axisX = 0, axisY = 0, axisZ = 0; //tilt of phone,
     private float angsX = 0, angsY = 0, angsZ = 0; //angular velocity
     private float coordXTip, coordYTip; // actual coordinates of tip of phone, to be returned to UI
+    private ArrayList<Float> last5Height = new ArrayList<Float>(5);
 
     private final float halfPhoneWidth = -0.0377f;//distance in meters from center of phone to left
     private final float halfPhoneHeight = 0.0782f;// distance in meters from center of phone to top
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sensor_checker);
-        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+
+    public sensorChecker(Sensor linAccel, Sensor gyro, StylishView customView) {
+        mLinearAccel = linAccel;
+        mGyro = gyro;
+        notepad = customView;
+        //mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         //Note, this automatically takes account of gravity for us
-        mLinearAccel= mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        //mLinearAccel= mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        //mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
     }
 
-    protected void onResume() {
-        super.onResume();
-        mSensorManager.registerListener(this, mLinearAccel, 10000);
-        mSensorManager.registerListener(this, mGyro, 10000);
-    }
 
-    protected void onPause() {
-        super.onPause();
-        mSensorManager.unregisterListener(this);
-    }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
@@ -63,11 +53,14 @@ public class sensorChecker extends AppCompatActivity implements SensorEventListe
         updateLoc(tDif);
         if (sensorEvent.sensor.getType() == sensorEvent.sensor.TYPE_GYROSCOPE){
             gyroChange(tDif, sensorEvent.values);
-            return;
         }
         else if (sensorEvent.sensor.getType() == sensorEvent.sensor.TYPE_LINEAR_ACCELERATION){
             accelChange(tDif, sensorEvent.values);
         }
+
+        //TODO: ACTIVATE
+        //notepad.victorSentMeSomething(getCoordinates());
+
     }
 
 /*this should, in order
@@ -168,6 +161,28 @@ update "initial" acceleration
         rotated[0] = rotated[0] + coordXCenter;
         rotated[1] = rotated[1] + coordYCenter;
         rotated[2] = rotated[2] + coordZCenter;
+
+        averageAdder(rotated[2]);
         return rotated;
+    }
+
+    private void averageAdder(float newValue){
+        if(last5Height.size() > 4){
+            last5Height.remove(0);
+        }
+        last5Height.add(newValue);
+    }
+
+    public float averageReturner(){
+        if(last5Height.get(4) != null) {
+            float average = 0;
+            for (float v : last5Height) {
+                average += v;
+            }
+
+            average = average / last5Height.size();
+            return average;
+        }
+        else return -1;
     }
 }
