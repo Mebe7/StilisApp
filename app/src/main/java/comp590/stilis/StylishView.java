@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 public class StylishView extends View {
@@ -58,11 +59,14 @@ public class StylishView extends View {
     public void victorSentMeSomething(float[] tip) {
         float newX = tip[0];
         float newY = tip[1];
+        Log.wtf("New Coord", newX + ", " + newY);
 
-        if(tip[2] < tallestPoint) {
+        //if(Math.pow((newX - lastX),2) > .002 || Math.pow((newY - lastY),2) > .002) {
+            //lastX = newX;
+            //lastY = newY;
             stylishPath.lineTo(newX, newY);
             invalidate();
-        }
+        //}
     }
 
     @Override

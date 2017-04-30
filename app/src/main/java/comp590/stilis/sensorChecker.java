@@ -46,7 +46,8 @@ update "initial" acceleration / update gyro
 
     public void onSensorChanged(SensorEvent sensorEvent){
         long cTime = System.nanoTime();
-        float tDif = cTime-mTime;
+        double tDif = cTime-mTime;
+        tDif =  tDif * Math.pow(10, -9);
         float nvX, nvY;
         p.updateLoc(tDif);
         if (sensorEvent.sensor.getType() == sensorEvent.sensor.TYPE_GYROSCOPE){
@@ -57,13 +58,13 @@ update "initial" acceleration / update gyro
         }
 
         notepad.victorSentMeSomething(p.getCoords());
-
+        mTime = System.nanoTime();
     }
 
     //Have this return when the phone height is calibrated. Until then, have it return -1
     public float averageReturner(){
 
-        return -1;
+        return 0;
     }
 }
 
@@ -134,9 +135,9 @@ class Phone{
         return rotated;
     }
 
-    void updateLoc(float tDif){
+    void updateLoc(double tDif){
 
-        float halfTimeSquared = (tDif * tDif)/2;
+        double halfTimeSquared = (tDif * tDif)/2;
         for(int i = 0; i<3; i++){
             axis[i] += angs[i]*tDif;
             //must be in this order to make physical sense
