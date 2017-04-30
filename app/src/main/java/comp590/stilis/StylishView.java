@@ -50,15 +50,18 @@ public class StylishView extends View {
         stylishPaint.setColor(Color.BLACK);
         stylishPaint.setStyle(Paint.Style.STROKE);
         stylishPaint.setAntiAlias(true);
+        stylishPaint.setStrokeWidth(5);
 
 
         stylishPath.moveTo(lastX, lastY);
+        //float[] toot = {50f, 50f, 0.2f};
+        //victorSentMeSomething(toot);
     }
 
     //TODO: RENAME and flesh out
     public void victorSentMeSomething(float[] tip) {
-        float newX = tip[0];
-        float newY = tip[1];
+        float newX = Math.abs(tip[0] * 1000);
+        float newY = Math.abs(tip[1] * 1000);
         Log.wtf("New Coord", newX + ", " + newY);
 
         //if(Math.pow((newX - lastX),2) > .002 || Math.pow((newY - lastY),2) > .002) {
