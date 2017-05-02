@@ -58,11 +58,9 @@ update "initial" acceleration / update gyro
         else if (sensorEvent.sensor.getType() == sensorEvent.sensor.TYPE_LINEAR_ACCELERATION){
             p.setAccel(sensorEvent.values);
         }
-        if(timeSinceScreenUpdate>10000000) {
-            notepad.victorSentMeSomething(p.getCoords());
-           // notepad.victorSentMeSomething(new float[]{p.xMax,p.yMax, 0f});
-            timeSinceScreenUpdate = 0;
-        }
+
+        notepad.victorSentMeSomething(p.getCoords());
+
         mTime = System.nanoTime();
         timeSinceScreenUpdate += mTime - cTime + tDif;
     }
@@ -90,8 +88,8 @@ class Phone{
         yMax = ((float)metrics.heightPixels -1)/ yScaler;
         cCenter[0] = xMax/2.0f;
         cCenter[1] = -yMax/2.0f;
-        halfPhoneHeight = ((float)metrics.heightPixels/3.0f) / yScaler;
-        halfPhoneWidth = -((float)metrics.widthPixels/3.0f) / xScaler;
+        halfPhoneHeight = ((float)metrics.heightPixels/2.0f) / yScaler;
+        halfPhoneWidth = -((float)metrics.widthPixels/2.0f) / xScaler;
 
     }
 
@@ -161,7 +159,7 @@ class Phone{
         for(int i = 0; i<3; i++){
             axis[i] += angs[i]*tDif;
             //must be in this order to make physical sense
-           // cCenter[i] += tDif*vel[i] + halfTimeSquared * accel[i];
+            cCenter[i] += tDif*vel[i] + halfTimeSquared * accel[i];
            // vel[i] += tDif* accel[i]; //try to not keep track of veloctiy, only use recent acceleration values
         }
         vCounter++;
@@ -216,7 +214,7 @@ class Phone{
 
         */
         //try rounding it down
-/*
+
         for (int i = 0; i<3; i++){
             int temp = (int)(values[i]*100.0f);
             accel[i] = (float) (temp/100);
