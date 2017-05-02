@@ -58,12 +58,15 @@ public class StylishView extends View {
         //victorSentMeSomething(toot);
     }
 
+    public void setBrush(float x, float y){
+        stylishPath.moveTo(x, y);
+    }
     //TODO: RENAME and flesh out
     public void victorSentMeSomething(float[] tip) {
 
 
-        float newX = tip[0]*1000;
-        float newY = -1* tip[1]*1000;
+        float newX = tip[0];
+        float newY = tip[1];
         Log.wtf("New Coord", newX + ", " + newY);
 
 

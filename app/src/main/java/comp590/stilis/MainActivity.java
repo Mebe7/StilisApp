@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,6 +30,9 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     private Sensor mLinearAccel;
     private Sensor mGyro;
     private AlertDialog messageBox;
+    private final float halfPhoneWidth = -0.0377f;//distance in meters from center of phone to left
+    private final float halfPhoneHeight = 0.0782f;// distance in meters from center of phone to top
+    private Phone p;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +50,12 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         mLinearAccel= mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
-        sensorListener = new sensorChecker(mLinearAccel, mGyro, notepad);
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        p = new Phone(halfPhoneHeight, halfPhoneWidth, metrics);
+        sensorListener = new sensorChecker(mLinearAccel, mGyro, notepad, p);
+
+        notepad.setBrush(metrics.widthPixels/2.0f, metrics.heightPixels/2.0f); // starts the drawing at middle of screen
 
         menuList.setAdapter(new ArrayAdapter<String>(this,
                 R.layout.drawer_list_item, menuItems));
@@ -246,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(sensorListener, mLinearAccel, 10000);
+        mSensorManager.registerListener(sensorListener, mLinearAccel, 1000);
         mSensorManager.registerListener(sensorListener, mGyro, 10000);
     }
 
