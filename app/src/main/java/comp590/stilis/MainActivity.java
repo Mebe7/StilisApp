@@ -1,5 +1,6 @@
 package comp590.stilis;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -19,7 +20,7 @@ import android.widget.ListView;
 
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DialogInterface.OnClickListener {
     private DrawerLayout drawer;
     private ListView menuList;
     private StylishView notepad;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private SensorManager mSensorManager;
     private Sensor mLinearAccel;
     private Sensor mGyro;
+    private AlertDialog messageBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +47,6 @@ public class MainActivity extends AppCompatActivity {
         mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
         sensorListener = new sensorChecker(mLinearAccel, mGyro, notepad);
-
-        mSensorManager.registerListener(sensorListener, mLinearAccel, 10000);
-        mSensorManager.registerListener(sensorListener, mGyro, 10000);
 
         menuList.setAdapter(new ArrayAdapter<String>(this,
                 R.layout.drawer_list_item, menuItems));
@@ -305,16 +304,18 @@ public class MainActivity extends AppCompatActivity {
     private void start(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setMessage("Please place your phone on the surface and wait" + '\n' + "We need to calibrate")
+        builder.setMessage("Please lay your phone on the surface in front of you")
                 .setTitle("Calibrating");
+        builder.setPositiveButton("Done!", this );
 
-        AlertDialog messageBox = builder.create();
+        messageBox = builder.create();
         messageBox.show();
+    }
 
-        while(sensorListener.averageReturner() == -1){}
-
-        notepad.setDrawingHeight(sensorListener.averageReturner() + .2f);
+    public void onClick(DialogInterface d, int b){
         messageBox.dismiss();
-
+        //register the listener only once the
+        mSensorManager.registerListener(sensorListener, mLinearAccel, 10000);
+        mSensorManager.registerListener(sensorListener, mGyro, 10000);
     }
 }

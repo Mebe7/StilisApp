@@ -1,5 +1,6 @@
 package comp590.stilis;
 
+import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -25,6 +26,7 @@ public class sensorChecker implements SensorEventListener{
         mLinearAccel = linAccel;
         mGyro = gyro;
         notepad = customView;
+
         //mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         //Note, this automatically takes account of gravity for us
         //mLinearAccel= mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
@@ -47,7 +49,6 @@ update "initial" acceleration / update gyro
     public void onSensorChanged(SensorEvent sensorEvent){
         long cTime = System.nanoTime();
         float tDif = cTime-mTime;
-        float nvX, nvY;
         p.updateLoc(tDif);
         if (sensorEvent.sensor.getType() == sensorEvent.sensor.TYPE_GYROSCOPE){
             p.setGyro(sensorEvent.values);
@@ -55,15 +56,9 @@ update "initial" acceleration / update gyro
         else if (sensorEvent.sensor.getType() == sensorEvent.sensor.TYPE_LINEAR_ACCELERATION){
             p.setAccel(sensorEvent.values);
         }
-
         notepad.victorSentMeSomething(p.getCoords());
-
-    }
-
-    //Have this return when the phone height is calibrated. Until then, have it return -1
-    public float averageReturner(){
-
-        return -1;
+        //notepad.victorSentMeSomething(new float[]{500f,500f,0f});
+        mTime = System.nanoTime();
     }
 }
 
