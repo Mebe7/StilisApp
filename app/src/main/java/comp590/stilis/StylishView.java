@@ -15,7 +15,7 @@ public class StylishView extends View {
     private Path stylishPath = new Path();
     private float lastX = 0; //Might need to do something with these to increase UX
     private float lastY = 0; //Might need to do something with these to increase UX
-    private float tallestPoint = 0; //maximum drawing height; if not set, cannot draw by design
+    private float tallestPoint = 1; //maximum drawing height; if not set, cannot draw by design
 
     public StylishView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
@@ -60,14 +60,18 @@ public class StylishView extends View {
 
     //TODO: RENAME and flesh out
     public void victorSentMeSomething(float[] tip) {
-        float newX = Math.abs(tip[0] * 1000);
-        float newY = Math.abs(tip[1] * 1000);
+
+
+        float newX = tip[0]*1000;
+        float newY = -1* tip[1]*1000;
         Log.wtf("New Coord", newX + ", " + newY);
+
 
         //if(Math.pow((newX - lastX),2) > .002 || Math.pow((newY - lastY),2) > .002) {
             //lastX = newX;
             //lastY = newY;
             stylishPath.lineTo(newX, newY);
+            stylishPath.moveTo(newX, newY);
             invalidate();
         //}
     }
