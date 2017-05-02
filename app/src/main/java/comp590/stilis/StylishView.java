@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 public class StylishView extends View {
@@ -49,21 +50,30 @@ public class StylishView extends View {
         stylishPaint.setColor(Color.BLACK);
         stylishPaint.setStyle(Paint.Style.STROKE);
         stylishPaint.setAntiAlias(true);
+        stylishPaint.setStrokeWidth(5);
 
 
         stylishPath.moveTo(lastX, lastY);
+        //float[] toot = {50f, 50f, 0.2f};
+        //victorSentMeSomething(toot);
     }
 
     //TODO: RENAME and flesh out
     public void victorSentMeSomething(float[] tip) {
+
+
         float newX = tip[0]*1000;
         float newY = -1* tip[1]*1000;
+        Log.wtf("New Coord", newX + ", " + newY);
 
-        if(tip[2] < tallestPoint) {
+
+        //if(Math.pow((newX - lastX),2) > .002 || Math.pow((newY - lastY),2) > .002) {
+            //lastX = newX;
+            //lastY = newY;
             stylishPath.lineTo(newX, newY);
             stylishPath.moveTo(newX, newY);
             invalidate();
-        }
+        //}
     }
 
     @Override

@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
             }
         });
 
-        start();
+        //start();
 
     }
 
